@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+torch
+torchaudio
+librosa
+soundfile
+numpy
+gTTS
+pydub
+scikit-learn
+torchvision
+python-dotenv
