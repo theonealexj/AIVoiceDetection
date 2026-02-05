@@ -95,6 +95,8 @@ async def detect_voice(request: AudioRequest, api_key: str = Depends(get_api_key
         b64_data = b64_data.replace("\n", "").replace("\r", "").replace(" ", "")
         
         print(f"DEBUG: Base64 Length: {len(b64_data)}")
+        print(f"DEBUG: Language field: {request.language}")
+        print(f"DEBUG: Full request dict: {request.dict(exclude_none=True)}")
         
         raw_result = predict_voice(b64_data)
         
