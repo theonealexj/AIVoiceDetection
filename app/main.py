@@ -30,15 +30,20 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 class AudioRequest(BaseModel):
-    # Field matching the tester's "Audio Base64 Format" label
+    # Multiple aliases to support different API testers
     audio_base64_format: Optional[str] = Field(None, alias="Audio Base64 Format")
-    # Backup for camelCase
     audio_base64_camel: Optional[str] = Field(None, alias="audioBase64Format")
-    # Original field (backward compatibility)
+    audio_base64_exact: Optional[str] = Field(None, alias="audioBase64")  # Exact match for the tester
     audio_base64: Optional[str] = None
+    audio: Optional[str] = None
+    base64: Optional[str] = None
+    audio_data: Optional[str] = None
+    audioData: Optional[str] = None
+    file: Optional[str] = None
     
     language: Optional[str] = Field(None, alias="Language")
     audio_format: Optional[str] = Field(None, alias="Audio Format")
+    audio_format_camel: Optional[str] = Field(None, alias="audioFormat")  # camelCase version
 
     class Config:
         allow_population_by_field_name = True
@@ -67,7 +72,10 @@ async def get_api_key(
 async def detect_voice(request: AudioRequest, api_key: str = Depends(get_api_key)):
     try:
         # Support various keys (Robustness for the tester)
-        b64_data = request.audio_base64_format or request.audio_base64 or request.audio_base64_camel
+        b64_data = (request.audio_base64_format or request.audio_base64 or 
+                   request.audio_base64_camel or request.audio_base64_exact or 
+                   request.audio or request.base64 or request.audio_data or 
+                   request.audioData or request.file)
         
         print(f"DEBUG: Request Fields: {request.dict(exclude_none=True).keys()}")
         if b64_data:
@@ -75,7 +83,8 @@ async def detect_voice(request: AudioRequest, api_key: str = Depends(get_api_key
         
         if not b64_data:
              print("DEBUG: Missing audio content")
-             raise HTTPException(status_code=400, detail="Missing audio content (audio_base64_format or audio_base64)")
+             print(f"DEBUG: Full request data: {request.dict()}")
+             raise HTTPException(status_code=400, detail="Missing audio content. Please provide audio data in one of these fields: audio_base64, audio, base64, audioData, or file")
         
         # Clean Base64 (Remove dataURI prefix if present)
         if "," in b64_data[:100]:

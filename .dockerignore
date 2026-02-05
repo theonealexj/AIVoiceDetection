@@ -1,0 +1,13 @@
+.venv/
+.git/
+data/
+*.bat
+ngrok.exe
+__pycache__/
+*.pyc
+.env
+sample_base64.txt
+*.mp3
+*.wav
+training/
+.gitignore

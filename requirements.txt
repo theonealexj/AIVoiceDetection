@@ -11,3 +11,4 @@ pydub
 scikit-learn
 torchvision
 python-dotenv
+requests
